@@ -18,7 +18,7 @@ function redisCache(config) {
 
         Promise
             .all(config.configure.map(options => new Promise((resolve, reject) => {
-                client.config('SET', ...options, function (err, result) {
+                client.CONFIG('SET', ...options, function (err, result) {
                     if (err || result !== 'OK') {
                         reject(err);
                     } else {
