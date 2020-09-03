@@ -66,14 +66,25 @@ module.exports = function cacheRenderer(nuxt, config) {
 
     const renderer = nuxt.renderer;
     const renderRoute = renderer.renderRoute.bind(renderer);
+    console.info(1111111);
     renderer.renderRoute = function(route, context) {
         // hopefully cache reset is finished up to this point.
-        tryStoreVersion(cache, currentVersion);
+        try {
+            tryStoreVersion(cache, currentVersion);
+        } catch (e) {
+            console.error(e);
+        }
 
-        const cacheKey = (config.cache.key || defaultCacheKeyBuilder)(route, context);
+        let cacheKey;
+        try {
+            cacheKey = (config.cache.key || defaultCacheKeyBuilder)(route, context);
+        } catch(e) {
+            console.error(e);
+        }
         if (!cacheKey) return renderRoute(route, context);
 
         function renderSetCache(){
+            console.info('set cache');
             return renderRoute(route, context)
                 .then(function(result) {
                     if (!result.error && !result.redirected) {
@@ -83,13 +94,16 @@ module.exports = function cacheRenderer(nuxt, config) {
                             console.error(Error(e));
                         }
                     }
+                    console.info('error?');
                     return result;
                 });
         }
 
+        console.info('get cache');
         return cache.getAsync(cacheKey)
             .then(function (cachedResult) {
                 if (cachedResult) {
+                    console.info(4, cachedResult);
                     return deserialize(cachedResult);
                 }
 
