@@ -29,20 +29,11 @@ function redisCache(config) {
             .then(() => client.quit());
     }
 
-    let redisCache;
-
-    try {
-        redisCache = cacheManager.caching({
-            store: require('cache-manager-redis'),
-            retry_strategy() {},
-            ...config,
-        });
-        console.error(Error(redisCache));
-    } catch (e) {
-        console.error(e);
-    }
-
-    return redisCache;
+    return cacheManager.caching({
+        store: require('cache-manager-redis'),
+        retry_strategy() {},
+        ...config,
+    });
 }
 
 function memcachedCache(config) {

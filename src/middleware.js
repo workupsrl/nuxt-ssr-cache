@@ -24,8 +24,6 @@ function tryStoreVersion(cache, version) {
 }
 
 module.exports = function cacheRenderer(nuxt, config) {
-    console.info(nuxt);
-    console.info(config);
     // used as a nuxt module, only config is provided as argument
     // and nuxt instance will be provided as this context
     if (arguments.length < 2 && this.nuxt) {
@@ -34,13 +32,11 @@ module.exports = function cacheRenderer(nuxt, config) {
     }
 
     if (!config.cache || !Array.isArray(config.cache.pages) || !config.cache.pages.length || !nuxt.renderer) {
-        console.error(Error('1'));
         return;
     }
 
     function isCacheFriendly(path, context) {
         if (typeof (config.cache.isCacheable) === 'function') {
-            console.error(Error(`2: ${config.cache.isCacheable(path, context)}`));
           return config.cache.isCacheable(path, context);
         }
 
@@ -53,9 +49,8 @@ module.exports = function cacheRenderer(nuxt, config) {
     }
 
     function defaultCacheKeyBuilder(route, context) {
-      var hostname = context.req && context.req.hostname || context.req && context.req.host;
-      console.error(Error('hostname'));
-      console.error(Error(hostname));
+      const hostname = context.req
+        && ((context.req.hostname || context.req.host) || context.req.headers && context.req.headers.host);
       if(!hostname) return;
       const cacheKey = config.cache.useHostPrefix === true && hostname
         ? path.join(hostname, route)
@@ -70,45 +65,26 @@ module.exports = function cacheRenderer(nuxt, config) {
 
     const renderer = nuxt.renderer;
     const renderRoute = renderer.renderRoute.bind(renderer);
-    console.error(Error(1111111));
     renderer.renderRoute = function(route, context) {
-        console.error(Error('RENDER ROUTE'));
         // hopefully cache reset is finished up to this point.
-        try {
-            tryStoreVersion(cache, currentVersion);
-        } catch (e) {
-            console.error(e);
-        }
+        tryStoreVersion(cache, currentVersion);
 
-        let cacheKey;
-        try {
-            cacheKey = (config.cache.key || defaultCacheKeyBuilder)(route, context);
-        } catch(e) {
-            console.error(e);
-        }
+        const cacheKey = (config.cache.key || defaultCacheKeyBuilder)(route, context);
         if (!cacheKey) return renderRoute(route, context);
 
         function renderSetCache(){
-            console.error(Error('set cache'));
             return renderRoute(route, context)
                 .then(function(result) {
                     if (!result.error && !result.redirected) {
-                        try {
-                            cache.setAsync(cacheKey, serialize(result));
-                        } catch (e) {
-                            console.error(Error(e));
-                        }
+                        cache.setAsync(cacheKey, serialize(result));
                     }
-                    console.error(Error('error?'));
                     return result;
                 });
         }
 
-        console.error(Error('get cache'));
         return cache.getAsync(cacheKey)
             .then(function (cachedResult) {
                 if (cachedResult) {
-                    console.error(cachedResult);
                     return deserialize(cachedResult);
                 }
 
