@@ -68,6 +68,7 @@ module.exports = function cacheRenderer(nuxt, config) {
     const renderRoute = renderer.renderRoute.bind(renderer);
     console.error(Error(1111111));
     renderer.renderRoute = function(route, context) {
+        console.error(Error('RENDER ROUTE'));
         // hopefully cache reset is finished up to this point.
         try {
             tryStoreVersion(cache, currentVersion);
