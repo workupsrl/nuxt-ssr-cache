@@ -24,6 +24,8 @@ function tryStoreVersion(cache, version) {
 }
 
 module.exports = function cacheRenderer(nuxt, config) {
+    console.info(nuxt);
+    console.info(config);
     // used as a nuxt module, only config is provided as argument
     // and nuxt instance will be provided as this context
     if (arguments.length < 2 && this.nuxt) {
