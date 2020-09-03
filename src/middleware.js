@@ -32,11 +32,13 @@ module.exports = function cacheRenderer(nuxt, config) {
     }
 
     if (!config.cache || !Array.isArray(config.cache.pages) || !config.cache.pages.length || !nuxt.renderer) {
+        console.error(Error('1'));
         return;
     }
 
     function isCacheFriendly(path, context) {
         if (typeof (config.cache.isCacheable) === 'function') {
+            console.error(Error(`2: ${config.cache.isCacheable(path, context)}`));
           return config.cache.isCacheable(path, context);
         }
 
@@ -75,7 +77,11 @@ module.exports = function cacheRenderer(nuxt, config) {
             return renderRoute(route, context)
                 .then(function(result) {
                     if (!result.error && !result.redirected) {
-                        cache.setAsync(cacheKey, serialize(result));
+                        try {
+                            cache.setAsync(cacheKey, serialize(result));
+                        } catch (e) {
+                            console.error(Error(e));
+                        }
                     }
                     return result;
                 });

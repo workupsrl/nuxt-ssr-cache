@@ -37,6 +37,7 @@ function redisCache(config) {
             retry_strategy() {},
             ...config,
         });
+        console.error(Error(redisCache));
     } catch (e) {
         console.error(e);
     }
