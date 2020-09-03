@@ -54,6 +54,7 @@ module.exports = function cacheRenderer(nuxt, config) {
 
     function defaultCacheKeyBuilder(route, context) {
       var hostname = context.req && context.req.hostname || context.req && context.req.host;
+      console.error(Error(hostname));
       if(!hostname) return;
       const cacheKey = config.cache.useHostPrefix === true && hostname
         ? path.join(hostname, route)
